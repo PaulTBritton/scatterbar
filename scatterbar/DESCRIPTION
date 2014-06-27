@@ -1,0 +1,10 @@
+Package: scatterbar
+Type: Package
+Title: Plot scatterbars from a list of number vectors
+Version: 1.0
+Date: 2014-06-27
+Imports: numform
+Author: Paul Thomas Britton
+Maintainer: Paul Thomas Britton <paul.t.britton@nasa.gov>
+Description: Plot scatterbars from a list of number vectors
+License: GPL-2
