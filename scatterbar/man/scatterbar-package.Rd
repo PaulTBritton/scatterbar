@@ -34,7 +34,8 @@ Maintainer: Paul Thomas Britton <paul.t.britton@nasa.gov>
 ~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
 }
 \examples{
+library(numform)
 x <- c(.1,.2,.3)
 y <- c(.2,.02,.03)
-scatterbar(file="xyplot.tiff",lst=plotlist(x,y))
+scatterbar(file="xyplot.tiff",plist=plotlist(x,y))
 }

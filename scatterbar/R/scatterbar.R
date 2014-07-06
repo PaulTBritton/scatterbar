@@ -11,24 +11,26 @@ notation <- function(num,prec,form) {
 }
 
 # a more intuitive name for alist() for the way scatterbar() uses alist()
-plotlist <- alist
+#plotlist <- alist
+plotlist <- function(...) eval(substitute(alist(...)))
 
 setnames <- function(lst,envir) {
-	myget <- function(x) get(as.character(x),envir)
+	getvalue <- function(x) eval(x,envir)
+	getname <- function(x) format(deparse(x))
 
 	savenames <- names(lst)
 	if (is.null(savenames)) {
-		newlst <- lapply(lst,myget)
-		names(newlst) <- lst
+		newlst <- lapply(lst,getvalue)
+		names(newlst) <- lapply(lst,getname)
 	} else {
 		i = 1
 		newnames <- savenames
 		newlst <- list()
 		for (n in savenames) {
 			if (n == "") {
-				newnames[i] <- as.character(lst[[i]])
+				newnames[i] <- getname(lst[[i]])
 			}
-			newlst[[i]] <- myget(lst[[i]])
+			newlst[[i]] <- getvalue(lst[[i]])
 			i = i + 1
 		}
 		names(newlst) <- newnames
@@ -99,31 +101,49 @@ scattertext <- function(stats,prec,tpos,i,Fifth,Fiftyith,Mean,Nfifth) {
 #		notation(max(X[i,]),2)), adj=c(0,0))
 }
 
+mylst <- function(x,envir) {
+	myget <- function(x) get(format(x),envir)
+
+	newlist <- lapply(x,myget)
+	names(newlist) <- x
+	return(newlist)
+}
+
+getT <- function(M) switch(as.character(M),"1"=1,"2"=1,"3"=1,"4"=2,"5"=2,3)
+
+gettsize <- function(T) switch(T,1,.87,.75)
+
+gettpos <- function(T) switch(T,c(.3,.45),c(.33,.48),c(.35,.55))
+
 # the scatterbar drawing routine
 scatterbar <- function(file="scatterbar.tiff",envir=parent.frame(),filter=".*",
-		lst=ls(envir,pattern=filter),logaxis="",rmarg=8,
-		xnotation=sciNotation,prec=2,stats=c(2,2,2,2),maintitle,lpos,
-		units="Probability",sbox=FALSE,stext=FALSE,tsize,tpos,xmarks,
-		range)
+		plist=mylst(ls(envir,pattern=filter),envir),
+		X=setnames(plist,envir),logaxis="",rmarg=8,
+		xnotation=sciNotation,prec=2,stats=c(2,2,2,2),maintitle=NULL,
+		units="Probability",sbox=FALSE,stext=FALSE,
+		tsize=gettsize(getT(length(X))),tpos=gettpos(getT(length(X))),
+		xmarks=calcxmarks(min(unlist(X)),max(unlist(X)),logaxis),
+		range=calcrange(min(unlist(X)),max(unlist(X)),logaxis),
+		lpos=NULL)
 {
-	X <- setnames(lst,envir)
-	ULX <- unlist(X)
-	rightm <- (max(ULX))
-	leftm <-(min(ULX))
+#	X <- setnames(lst,envir)
+#	ULX <- unlist(X)
+#	rightm <- (max(ULX))
+#	leftm <-(min(ULX))
 
-	L <- names(X)
-	M <- length(L)
-	T <- switch(as.character(M),"1"=1,"2"=1,"3"=1,"4"=2,"5"=2,3)
-	if(missing(tsize)) tsize <- switch(T,1,.87,.75)
-	if(missing(tpos)) tpos <- switch(T,c(.3,.45),c(.33,.48),c(.35,.55))
+#	L <- names(X)
+	M <- length(X)
+#	T <- getT(M)
+#	if(missing(tsize)) tsize <- gettsize(T)
+#	if(missing(tpos)) tpos <- gettpos(T)
 
 #	if(VerboseLevel == 3) {
 #		print(paste("Calculated Right Margin =",rightm))
 #		print(paste("Calculated Left Margin =",leftm))
 #	}
 	# xmarks: need to test the linear scale case
-	if (missing(xmarks)) xmarks <- calcxmarks(leftm,rightm,logaxis)
-	if (missing(range)) range <- calcrange(leftm,rightm,logaxis)
+#	if (missing(xmarks)) xmarks <- calcxmarks(leftm,rightm,logaxis)
+#	if (missing(range)) range <- calcrange(leftm,rightm,logaxis)
 
 #	if (VerboseLevel > 0) print(paste("scatterbar() opening:",file))
 	tiff(file,width=11,height=8,units="in",bg="white",res=300)
@@ -133,13 +153,11 @@ scatterbar <- function(file="scatterbar.tiff",envir=parent.frame(),filter=".*",
 		col="black",cex=.7)
 		#,axes=FALSE ,xlab="",ylab="",frame.plot=TRUE)
 	box()
-	axis(4,1:M,labels = L,hadj=0,las=1)
+	axis(4,1:M,labels = names(X),hadj=0,las=1)
 	axis(side=1,at=xmarks,labels=xnotation(xmarks),las=0)
 	xscale <- switch(logaxis,x=" (log scale)","(linear scale)")
 	mtext(paste(units,xscale),font=2,side=1,line=3)
-	if (!missing(maintitle)) {
-		title(main=maintitle)
-	}
+	title(main=maintitle)
 
 	# draw grid
 #	grid(12,(M+1),lwd=1.2,lty=1,col="gray")
@@ -177,7 +195,7 @@ scatterbar <- function(file="scatterbar.tiff",envir=parent.frame(),filter=".*",
 			Fiftyith,Mean,Nfifth)
 	}
 
-	if (!missing(lpos)) {
+	if (!is.null(lpos)) {
 		par(cex=1)
 		legend(lpos[1],lpos[2],
 			c("Samples","Median","Mean","5th - 95th"),
@@ -185,4 +203,5 @@ scatterbar <- function(file="scatterbar.tiff",envir=parent.frame(),filter=".*",
 			lwd=c(2,2,2,2),
 			col=c(gray(.3),"darkorange1","red3","blue"))
 	}
+	junk <- dev.off()
 }

@@ -10,7 +10,15 @@ plot scatterbars from a list of number vectors
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-scatterbar(file = "scatterbar.tiff", envir = parent.frame(), filter = ".*", lst = ls(envir, pattern = filter), logaxis = "", rmarg = 8, xnotation = sciNotation, prec = 2, stats = c(2, 2, 2, 2), maintitle, lpos, units = "Probability", sbox = FALSE, stext = FALSE, tsize, tpos, xmarks, range)
+scatterbar(file="scatterbar.tiff",envir=parent.frame(),filter=".*",
+		plist=mylst(ls(envir,pattern=filter),envir),
+		X=setnames(plist,envir),logaxis="",rmarg=8,
+		xnotation=sciNotation,prec=2,stats=c(2,2,2,2),maintitle=NULL,
+		units="Probability",sbox=FALSE,stext=FALSE,
+		tsize=gettsize(getT(length(X))),tpos=gettpos(getT(length(X))),
+		xmarks=calcxmarks(min(unlist(X)),max(unlist(X)),logaxis),
+		range=calcrange(min(unlist(X)),max(unlist(X)),logaxis),
+		lpos=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -26,8 +34,12 @@ scatterbar(file = "scatterbar.tiff", envir = parent.frame(), filter = ".*", lst 
 	Wildcard pattern to match which number vectors to plot
 %%     ~~Describe \code{filter} here~~
 }
-  \item{lst}{
+  \item{plist}{
 	Explicit plotlist of object names and (optional) descriptions of objects to plot
+%%     ~~Describe \code{lst} here~~
+}
+  \item{X}{
+	Explicit named list of objects to plot
 %%     ~~Describe \code{lst} here~~
 }
   \item{logaxis}{
@@ -54,10 +66,6 @@ scatterbar(file = "scatterbar.tiff", envir = parent.frame(), filter = ".*", lst 
   \item{maintitle}{
 	main title of plot
 %%     ~~Describe \code{maintitle} here~~
-}
-  \item{lpos}{
-	position of optional legend
-%%     ~~Describe \code{lpos} here~~
 }
   \item{units}{
 	label for x-axis units. e.g. probability, length, etc.
@@ -86,6 +94,10 @@ scatterbar(file = "scatterbar.tiff", envir = parent.frame(), filter = ".*", lst 
   \item{range}{
 	range of x-axis
 %%     ~~Describe \code{range} here~~
+}
+  \item{lpos}{
+	position of optional legend
+%%     ~~Describe \code{lpos} here~~
 }
 }
 \details{
@@ -117,9 +129,10 @@ Paul Thomas Britton
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 }
 \examples{
+library(numform)
 x <- c(.1,.2,.3)
 y <- c(.2,.02,.03)
-scatterbar(file="xyplot.tiff",lst=plotlist(x,y))
+scatterbar(file="xyplot.tiff",plist=plotlist(x,y))
 ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
