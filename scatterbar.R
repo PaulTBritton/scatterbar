@@ -115,8 +115,13 @@ gettsize <- function(T) switch(T,1,.87,.75)
 
 gettpos <- function(T) switch(T,c(.3,.45),c(.33,.48),c(.35,.55))
 
+stiff <- function(file="plot.tiff",width=11,height=8,units="in",bg="white",
+		res=300) {
+	tiff(file=file,width=width,height=height,units=units,bg=bg,res=res)
+}
+
 # the scatterbar drawing routine
-scatterbar <- function(file="scatterbar.tiff",envir=parent.frame(),filter=".*",
+scatterbar <- function(file,envir=parent.frame(),filter=".*",
 		plist=mylst(ls(envir,pattern=filter),envir),
 		X=setnames(plist,envir),logaxis="",rmarg=8,
 		xnotation=sciNotation,prec=2,stats=c(2,2,2,2),maintitle=NULL,
@@ -146,9 +151,12 @@ scatterbar <- function(file="scatterbar.tiff",envir=parent.frame(),filter=".*",
 #	if (missing(range)) range <- calcrange(leftm,rightm,logaxis)
 
 #	if (VerboseLevel > 0) print(paste("scatterbar() opening:",file))
-	tiff(file,width=11,height=8,units="in",bg="white",res=300)
-	par(mar=c(6,2,2,rmarg))
+	if (!missing(file)) {
+		stiff(file=file,width=11,height=8,units="in",
+			bg="white",res=300)
+	}
 	plot.new()
+	par(mar=c(6,2,2,rmarg))
 	plot.window(log=logaxis,xlim=range,ylim=c(.5,M+.5),pch=20,
 		col="black",cex=.7)
 		#,axes=FALSE ,xlab="",ylab="",frame.plot=TRUE)
@@ -203,5 +211,7 @@ scatterbar <- function(file="scatterbar.tiff",envir=parent.frame(),filter=".*",
 			lwd=c(2,2,2,2),
 			col=c(gray(.3),"darkorange1","red3","blue"))
 	}
-	junk <- dev.off()
+	if (!missing(file)) {
+		junk <- dev.off()
+	}
 }

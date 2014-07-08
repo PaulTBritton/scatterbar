@@ -10,7 +10,7 @@ plot scatterbars from a list of number vectors
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-scatterbar(file="scatterbar.tiff",envir=parent.frame(),filter=".*",
+scatterbar(file,envir=parent.frame(),filter=".*",
 		plist=mylst(ls(envir,pattern=filter),envir),
 		X=setnames(plist,envir),logaxis="",rmarg=8,
 		xnotation=sciNotation,prec=2,stats=c(2,2,2,2),maintitle=NULL,
@@ -23,7 +23,7 @@ scatterbar(file="scatterbar.tiff",envir=parent.frame(),filter=".*",
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{file}{
-	Name of tiff file for plot output
+	Optional Name of tiff file for plot output
 %%     ~~Describe \code{file} here~~
 }
   \item{envir}{

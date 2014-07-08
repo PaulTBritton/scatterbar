@@ -1,2 +1,2 @@
 import(numform)
-export(plotlist,scatterbar)
+export(plotlist,stiff,scatterbar)
